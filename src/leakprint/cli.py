@@ -6,6 +6,7 @@ import typer
 
 from leakprint import __version__
 from leakprint.pipeline import run_pipeline
+from leakprint.secrets import load_secrets
 
 app = typer.Typer(
     name="leakprint",
@@ -178,7 +179,15 @@ def main(
         "-v",
         help="Show version",
     ),
+    secrets: Path = typer.Option(
+        None,
+        "--secrets",
+        "-s",
+        path_type=Path,
+        help="Path to secrets.yaml (default: cwd/secrets.yaml or LEAKPRINT_SECRETS_PATH)",
+    ),
 ) -> None:
+    load_secrets(secrets)
     if version:
         typer.echo(f"leakprint {__version__}")
         raise typer.Exit()
