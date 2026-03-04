@@ -6,7 +6,7 @@
 
 - **MVP:** Complete and runnable
 - **Git:** No commits yet; all files untracked on `main`
-- **Tests:** 13 passing
+- **Tests:** 22 passing
 
 ## What's done
 
@@ -22,7 +22,7 @@
 ## Known / pending
 
 - **NVD API key:** Requested; can take 7+ days. Until then: 5 req/30s limit; first run ~2–3 min, cached runs faster.
-- **Secrets:** `HASS_URL` and `HASS_TOKEN` live in `secrets.yaml` in other repos. Leakprint currently reads env vars only. Consider adding a secrets file loader (e.g. `LEAKPRINT_SECRETS_PATH` or `secrets.yaml` in cwd) that populates env when vars are unset.
+- **Secrets:** ~~Done.~~ `secrets.yaml` loader added (`--secrets` CLI flag, `LEAKPRINT_SECRETS_PATH` env var, or auto-detect `./secrets.yaml`). Env vars take precedence. Supports `hass_url`, `hass_token`, `nvd_api_key`.
 
 ## How to run
 
@@ -32,7 +32,14 @@ pip install -e .
 leakprint run --inventory examples/inventory.csv --out artifacts/
 ```
 
-With Home Assistant:
+With Home Assistant (via secrets.yaml):
+
+```bash
+# Create secrets.yaml with hass_url, hass_token, nvd_api_key
+leakprint run --from-ha --out artifacts/
+```
+
+Or via env vars:
 
 ```bash
 export HASS_URL=http://homeassistant.local:8123
@@ -59,6 +66,7 @@ src/leakprint/
   match.py        # Normalization, search query builder
   scoring.py      # Risk rubric
   reporting.py   # Artifact writers
+  secrets.py     # YAML secrets loader
   ingest/        # csv_ingest, ha_ws_ingest
   enrich/        # kev_client, nvd_client
 ```

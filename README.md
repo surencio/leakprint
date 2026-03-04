@@ -73,14 +73,33 @@ leakprint run --inventory examples/inventory.csv --out artifacts/
 - `--from-ha` – Ingest from Home Assistant (uses `HASS_URL`, `HASS_TOKEN`)
 - `--out`, `-o` – Output directory (default: `artifacts/`)
 - `--cache`, `-c` – Cache directory (default: `cache/`)
+- `--secrets`, `-s` – Path to secrets.yaml (see below)
 - `--max-nvd-results` – Max CVE results per device (default: 20)
 - `--kev-ttl-hours` – KEV cache TTL in hours (default: 24)
+
+## Secrets
+
+Leakprint can load secrets from a YAML file instead of requiring environment variables. Lookup order:
+
+1. `--secrets /path/to/secrets.yaml` CLI option
+2. `LEAKPRINT_SECRETS_PATH` environment variable
+3. `secrets.yaml` in the current working directory
+
+Environment variables already set take precedence over the file.
+
+```yaml
+# secrets.yaml
+hass_url: http://homeassistant.local:8123
+hass_token: your-long-lived-token
+nvd_api_key: optional-key
+```
 
 ## Environment variables
 
 - `HASS_URL` – Home Assistant URL (e.g. `http://homeassistant.local:8123`)
 - `HASS_TOKEN` – Long-lived access token for Home Assistant
 - `NVD_API_KEY` – Optional; improves NVD rate limits
+- `LEAKPRINT_SECRETS_PATH` – Path to a secrets.yaml file
 
 ## Outputs
 
@@ -94,7 +113,7 @@ leakprint run --inventory examples/inventory.csv --out artifacts/
 
 - Leakprint does not upload your inventory to third parties.
 - MAC addresses and unique identifiers are not output by default.
-- Tokens and secrets are read from environment variables only; never hardcoded.
+- Tokens and secrets are read from environment variables or a local `secrets.yaml`; never hardcoded.
 - Public datasets (KEV, NVD) are cached locally to limit API calls.
 
 ## Development

@@ -8,9 +8,6 @@ import os
 from leakprint.models import Device
 from leakprint.match import normalize_vendor, normalize_model
 
-HASS_URL = os.environ.get("HASS_URL", "")
-HASS_TOKEN = os.environ.get("HASS_TOKEN", "")
-
 # Category mapping from HA device class or model hints
 CATEGORY_MAP = {
     "router": ["router", "gateway", "access point"],
@@ -44,13 +41,16 @@ async def _fetch_devices_async() -> list[dict]:
     except ImportError:
         raise RuntimeError("websockets package required for --from-ha")
 
-    url = HASS_URL.rstrip("/")
+    hass_url = os.environ.get("HASS_URL", "")
+    hass_token = os.environ.get("HASS_TOKEN", "")
+
+    url = hass_url.rstrip("/")
     if not url.startswith("http"):
         url = f"http://{url}"
     ws_url = url.replace("http://", "ws://").replace("https://", "wss://")
     ws_url = f"{ws_url}/api/websocket"
 
-    if not HASS_TOKEN:
+    if not hass_token:
         raise ValueError("HASS_TOKEN env var required for --from-ha")
 
     async with websockets.connect(ws_url) as ws:
@@ -59,7 +59,7 @@ async def _fetch_devices_async() -> list[dict]:
         if data.get("type") != "auth_required":
             raise RuntimeError(f"Unexpected HA response: {data.get('type')}")
 
-        await ws.send(json.dumps({"type": "auth", "access_token": HASS_TOKEN}))
+        await ws.send(json.dumps({"type": "auth", "access_token": hass_token}))
         msg = await ws.recv()
         auth = json.loads(msg)
         if auth.get("type") != "auth_ok":
@@ -75,7 +75,7 @@ async def _fetch_devices_async() -> list[dict]:
 
 def ingest_from_ha() -> list[Device]:
     """Ingest devices from Home Assistant. Raises on connection/auth errors."""
-    if not HASS_URL:
+    if not os.environ.get("HASS_URL"):
         raise ValueError("HASS_URL env var required for --from-ha")
 
     entries = asyncio.run(_fetch_devices_async())
