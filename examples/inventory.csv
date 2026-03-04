@@ -1,0 +1,6 @@
+category,vendor,model,device_name,cloud_required,notes
+router,tp-link,Archer A7,Main Router,yes,ISP provided
+camera,wyze,Cam v3,Front Door,optional,Local recording
+light,philips,Hue Bridge,Hub,yes,
+lock,august,Smart Lock Pro,Front Door,yes,
+thermostat,nest,Learning Thermostat,Living Room,yes,

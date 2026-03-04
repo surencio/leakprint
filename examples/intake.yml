@@ -1,0 +1,5 @@
+# Optional intake template - not required for MVP
+# devices:
+#   - category: router
+#     vendor: tp-link
+#     model: Archer A7
